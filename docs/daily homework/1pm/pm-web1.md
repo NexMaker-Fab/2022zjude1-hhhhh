@@ -146,6 +146,6 @@ The sidebar and its contraction, cover page and search bar will be described in 
 >![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202210110319460.png)
 
 # 6.Save all document and repeat step 1.4
-# Last but not least
+# 7.Last but not least
 Congratulation!  
 You did it!
