@@ -6,15 +6,11 @@
   - [Leng Shiyang](team%20introduce/Leng%20Shiyang.md)
   - [Wang Chen](team%20introduce/Wang%20Chen.md)
 - Daily homework
-  - [1. PM]()
-    - [how to build web](class/1pm/pm-web1.md)
-  - [2. arduino basic]()
-  - [3. CAD]()
-  - [4. 3D printing]()
+  - [1. PM](daily%20homework/1pm/pm-guidebook.md)
+    - [How to build web](daily%20homework/1pm/pm-web1.md)
+  - [2. CAD]()
+  - [3. 3D printing]()
 - Final project
-  - topic
-  - innovation
-  - market
-  - how to design 
-  - how to make
-  - SDGs
+  - [Description](final%20project/description.md)
+  - [How to design](final%20project/how%20to%20design.md) 
+  - [How to make](final%20project/how%20to%20make.md)
