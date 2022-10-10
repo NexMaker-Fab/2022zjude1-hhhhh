@@ -1,5 +1,5 @@
 
-# First and foremost
+# 0.First and foremost
 There are many ways to build a website. We use "docsify" here, which is a magic tool for generating document websites.   
 The main tutorial we refer to is this: [the main tutorial](https://www.nexmaker.com/doc/1projectmanage/github&docsify.html)
 # 1.Some preparatory work
@@ -131,7 +131,6 @@ The sidebar and its contraction, cover page and search bar will be described in 
 
 >Add the profile `_coverpage.md` to configure the coverpage, the code and rendering are as follows:  
 ```
-<!-- ![logo](media/hhhhh.jpg) -->
 # Peopl3 Drag Per2on  
 ## Welcome to the website of our team 
 * TECHNOLOGY
