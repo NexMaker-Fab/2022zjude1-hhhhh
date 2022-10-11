@@ -35,7 +35,9 @@ Before installing `docsify`, we need to install the `npm` package manager, and t
 >``` docsify serve docs```  
 >You will get the following results.   
 >![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202210110154062.png)  
->Then opern browser to visit http://localhost:3000, you will get a initial website. 
+>Then opern browser to visit http://localhost:3000, you will get a initial website.   
+>What i want to emphasize is that :  
+>You need to hang a cmd service to modify the document before it can be updated to the website.
 
 ## 1.5 Image upload 
 We use picgo+github to load images.
