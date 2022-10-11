@@ -42,6 +42,7 @@ We use picgo+github to load images.
 >The tutorial is at this [link](https://www.nexmaker.com/doc/1projectmanage/imageuploadservice.html).  
 >What i want to emphasize is 2 points.  
 >1.In the step to generate a new token ,the following boxes must be chosen, otherwise the images cannot be uploaded.  
+>![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202210111844398.png)  
 >2.When the token has been generated, you must copy the token at time, otherwise the token would not be found again.
 
 # 2.Setting `index.html`
