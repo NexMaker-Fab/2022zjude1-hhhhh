@@ -8,7 +8,7 @@
 - Daily homework
   - [1. PM](daily%20homework/1pm/pm-guidebook.md)
     - [How to build web](daily%20homework/1pm/pm-web1.md)
-  - [2. CAD]()
+  - [2. CAD](daily%20homework/2cad/cad-build.md)
   - [3. 3D printing]()
 - Final project
   - [Description](final%20project/description.md)
