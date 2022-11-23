@@ -2,14 +2,15 @@
 - Team introduce
   - [Yang Haohao](team%20introduce/Yang%20Haohao.md)
   - [Tang Yinlin](team%20introduce/Tang%20Yilin.md)
-  - [Gu Yuxin](team%20introduce/Tang%20Yilin.md)
+  - [Gu Yuxin](team%20introduce/Gu%20Yuxin.md)
   - [Leng Shiyang](team%20introduce/Leng%20Shiyang.md)
   - [Wang Chen](team%20introduce/Wang%20Chen.md)
 - Daily homework
   - [1. PM](daily%20homework/1pm/pm-guidebook.md)
     - [How to build web](daily%20homework/1pm/pm-web1.md)
   - [2. CAD](daily%20homework/2cad/cad-build.md)
-  - [3. 3D printing]()
+  - [3. Interface Application Programming](daily%20homework/3processing/processing.md)
+  - [4. Arduino application](daily%20homework/4arduino/arduino.md)
 - Final project
   - [Description](final%20project/description.md)
   - [How to design](final%20project/how%20to%20design.md) 
