@@ -89,13 +89,15 @@ ENB，IN3/IN4，OUT3/OUT4引脚控制第二路输出，与上述ENB，IN3/IN4，
 
 + #### 识别手写体 
 > ##### 1、用OpenCV自带的神经网络
->[题主选用的BP算法进行训练，准确咧90%](https://blog.csdn.net/sheng_ai/article/details/23956919?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-23956919-blog-59727212.pc_relevant_recovery_v2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-23956919-blog-59727212.pc_relevant_recovery_v2&utm_relevant_index=3)
+>[题主选用的BP算法进行训练，准确咧90%](https://blog.csdn.net/sheng_ai/article/details/23956919?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-23956919-blog-59727212.pc_relevant_recovery_v2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-23956919-blog-59727212.pc_relevant_recovery_v2&utm_relevant_index=3)  
+>
 >训练函数如下图 
 >![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241303667.png)
 > ##### 2、KNN
 >[链接(opencv官方给的手写体数字识别的例子也用的KNN)](https://blog.csdn.net/zzlwl/article/details/125216262)
 > ##### 3、其他
 >[演示：基于Python+OpenCV+TensorFlow手写汉字识别系统](https://www.bilibili.com/video/av216101007/) 
+>
 >[使用C++结合Opencv库实现简易汉字识别](https://blog.csdn.net/weixin_44297922/article/details/121496280)
 
 
