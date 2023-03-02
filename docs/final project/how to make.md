@@ -73,7 +73,7 @@
 ># 第二个参数 0 代表按列取最大值并返回对应的行索引值，1 代表按行取最大值并返回对应的列索引值。
 >pred = torch.max(prediction, 1)[1]
 >print(pred) 
->``` 
+>```   
 
 <table><tr><td bgcolor=DarkSeaGreen ><font size=5 color=white>数字识别方案二一(包含手写数字识别、英文字母识别) : opencv + Intel模型推理框架OpenVINO <font></td></tr></table> 
 
@@ -160,7 +160,16 @@
 >        preds = infer_request.get_tensor(output_tensor_name).data[:]
 >        result = codec.decode(preds)
 >        print(result)
->```
+>``` 
+
+<table><tr><td bgcolor=DarkSeaGreen ><font size=5 color=white>颜色识别 : <font></td></tr></table>  
+
+>#### 1.使用摄像头采集图像 
+
+
+
+
+
 
 
 
