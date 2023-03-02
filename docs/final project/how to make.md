@@ -213,7 +213,7 @@
 <table><tr><td bgcolor=DarkSeaGreen ><font size=5 color=white>物体移动检测：opencv对比视频前后帧 <font></td></tr></table>  
 
 >摄像头获取图像——————预处理——————前后帧的对比并进行处理——————根据面积判断是否有移动  
->#### 1.打开摄像头获取图像 
+>#### 1.打开摄像头、设置帧率，获取图像 
 >``` 
 >camera = cv2.VideoCapture(0)
 >if camera.open:
