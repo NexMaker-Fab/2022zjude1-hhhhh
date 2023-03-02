@@ -176,12 +176,12 @@
 >cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 >cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 >```  
->### 2.颜色空间转换（BGR转HSV） 
+>#### 2.颜色空间转换（BGR转HSV） 
 >```
 >_, frame = cap.read()
 >hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV) 
 >``` 
->### 3.获取中心点像素位置及hsv  
+>#### 3.获取中心点像素位置及hsv  
 >```
 >height, width, _ = frame.shape
 >cx = int(width / 2)
@@ -189,7 +189,7 @@
 ># 获取中心位置像素点的hsv值
 >pixel_center = hsv_frame[cy, cx]
 >``` 
->### 4.根据h空间进行颜色识别 
+>#### 4.根据h空间进行颜色识别 
 >```
 > # 获取 H 空间的数值
 >hue_value = pixel_center[0] 
