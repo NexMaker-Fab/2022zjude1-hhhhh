@@ -1,108 +1,173 @@
 # How to make 
 ![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241057411.png) 
-<center>总体框架</center> 
+<center>总体框架</center>  
 
-![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241232653.png)
++ ## 摄像头识别模块  
 
-用Arduino做实时的数据采集和控制，树莓派做上位机负责管理系统，Arduino 做下位机负责控制其他硬件，实现优势互补。 
+<table><tr><td bgcolor=DarkSeaGreen ><font size=5 color=white>数字识别方案一(仅手写数字识别) : opencv + CNN + PyTorch <font></td></tr></table> 
 
-### 故事触发模块 
-+ #### 采用模块
-<table><tr><td bgcolor=DarkSeaGreen>RC522+rfid标签</td></tr></table>
+>#### 1.使用摄像头采集图像 
+>``` 
+>VideoCapture(“../test.avi”)
+>cap = cv2.VideoCapture(0)
+>while cap.isOpened():
+>    # 读取视频
+>    # 第一个ret 为True 或者False,代表有没有读取到图片
+>    # 第二个frame表示截取到一帧的图片
+>    ret, frame = cap.read()
+>    # 判读是否按下q键，按下q键关闭摄像头；
+>    if cv2.waitKey(30) & 0xff == ord('q'):
+>        break
+>    # 显示画面
+>    cv2.imwrite('number5.jpg',frame)
+>    cv2.imshow('number5.jpg', frame)
+># 释放摄像头
+>cap.release()
+># 销毁窗口
+>cv2.destroyAllWindows()
+>```  
+>#### 2.图像预处理，使其格式与数据集相同 
+>灰度图——————二值化——————每个像素取反——————重新修改大小——————转换成tensor型并升维
+>```
+>img = cv2.imread('number5.jpg')
+># 将图片转为灰度图
+>gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+># 最大类间方差法(大津算法)，thresh会被忽略，自动计算一个阈值（二值化）
+>retval, gray = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+># 创建一个size和img相同的黑色图像
+>img2 = np.zeros_like(img)
+># 遍历每个通道，反转颜色。采集的图片为黑字白底，而数据集为白字黑底。
+>img2[:,:,0] = 255-gray
+>img2[:,:,1] = 255-gray
+>img2[:,:,2] = 255-gray
+>img = cv2.resize(img2, (28, 28))
+># 进行神经网络训练时使用的数据类型是tensor型，因此进行转化
+>img_tensor = transforms.ToTensor()(img)
+>img_tensor = img_tensor.unsqueeze(0) # 升维
+>```  
+>#### 3.加载模型并转化为onnx类型  
+>```
+>use_cuda = False
+>model = Net(10)
+># 注意：此处应把pth文件改为你训练出来的params_x.pth，x为epoch编号
+># 一般来讲，编号越大，且训练集（train）和验证集（val）上准确率差别越小的（避免过拟合），效果越好。
+># model = Net()新生成的一个新模型，model要将训练出来的params_x.pth中的参数加载加载进来
+>model.load_state_dict(torch.load('output/params_yl.pth'))
+># model = torch.load('output/model.pth')
+># 评估模式。而非训练模式
+># 在评估模式下，batchNorm层，dropout层等用于优化训练而添加的网络层会被关闭，从而使得评估时不会发生偏移
+>model.eval()
+>if use_cuda and torch.cuda.is_available():
+>    model.cuda()
+># ONNX 的目的在于提供一个跨框架的模型中间表达框架，用于模型转换和部署。ONNX 提供的计算图是通用的，格式也是开源的。
+>to_onnx(model, 3, 28, 28, 'output/params.onnx')  
+>```   
+>#### 4.识别 
+>``` 
+>if use_cuda and torch.cuda.is_available():
+>    prediction = model(Variable(img_tensor.cuda()))
+>else:
+>    prediction = model(Variable(img_tensor))
+># torch.max(x , 1)返回两个结果，
+># 第一个是最大值，第二个是对应的索引值；
+># 第二个参数 0 代表按列取最大值并返回对应的行索引值，1 代表按行取最大值并返回对应的列索引值。
+>pred = torch.max(prediction, 1)[1]
+>print(pred) 
+>``` 
 
-+ #### 技术原理与方案 
-![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241133461.png) 
-<center>接线方式（需要焊接）</center>  
+<table><tr><td bgcolor=DarkSeaGreen ><font size=5 color=white>数字识别方案二一(包含手写数字识别、英文字母识别) : opencv + Intel模型推理框架OpenVINO <font></td></tr></table> 
 
-### 发声讲故事模块
-+ #### 采用模块 
-<table><tr><td bgcolor=DarkSeaGreen>DFPlaye Mini MP3模块</td></tr></table> 
-
-DFPlayer Mini MP3模块，可以直接接驳扬声器。模块配合供电电池、扬声器、按键可以单独使用，也可以通过串口控制，作为Arduino UNO或者是任何有串口的单片机的一个模块。模块本身集成了MP3、WAV、WMA的硬解码。同时软件支持TF卡驱动，支持FAT16、FAT32文件系统。通过简单的串口指令即可完成播放指定的音乐，以及如何播放音乐等功能。 
-
-![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241116867.png) 
-![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241118700.png) 
-<center>引脚说明</center> 
-
-+ #### 技术原理与方案
-![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241120386.png)
-<center>接线方式</center> 
-
-![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241131218.png) 
-<center>方案</center>  
-
-### 驱动循迹模块
-+ #### 驱动模块 
-<table><tr><td bgcolor=DarkSeaGreen>电机驱动模块 L298N</td></tr></table> 
-
-![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241136236.png)  
-L298N是一个内部有两个H桥的驱动芯片，这样电机的运转只需要用三个信号控制：两个方向信号和一个使能信号。(输入的电压不可超过它的额定电压）
-L298N芯片的工作电压需要两路：  
-第一路：输出供给电机回路的工作电源  
-第二路：输入逻辑控制回路电源5V（电源出/入）
-
-+12V：该引脚接的电压是驱动模块所能输出给电机的最大电压，一般 直接接电池。12V是由L298N芯片所能接受最大电压而定，一般介入5~12V电压。在此我们接入的电压为两节18650串联的电压，即3.7+3.7=7.4V； 
-
-GND： 电源的负极，同时要保证Arduino开发板，驱动模块等所有模块的GND连在一起才可以正常工作。 
-
-+5V： L298N模块内含稳压电路，在模块内部将"+12V"引脚输入的电压转化为可供开发板使用的+5V电压，一般将次输出接入到开发板为开发板供电。
-L298N有两路输出，所以可以控制小车前进、后退、转弯，其中： 
-
-ENA： 代表第一路输出的电压大小。驱动模块输出电压越高，电机转速越快。 
-1.当其输入为0V的时候，驱动模块输出对第一路电机输出电压为0V； 
-2.当其输入为3.3V的时候，驱动模块对第一路电机输出电压为"+12V"引脚的输入电压。 
-3.由于ENA输入电压的高低控制驱动对电机的输出电压，因此当我们需要对小车运动速度进行控制的时候，一般通过PWM对"ENA"引脚进行控制。 
-
-IN1/IN2：这两个引脚控制电机正反转方向。 
-
-OUT1/OUT2：这两个引脚分别接电机的两极。 
-
-ENB，IN3/IN4，OUT3/OUT4引脚控制第二路输出，与上述ENB，IN3/IN4，OUT3/OUT4功能相似
-
-+ #### 循迹模块 
-循迹原理： 利用红外线对于不同颜色具有不同的反射性质的特点。行驶过程中传感器的红外发射二极管不断发射红外光，当红外光遇到白色地面时发生漫反射，红外对管接收管接收反射光；如果遇到黑线则红外光被吸收，则红外管接收不到信号。
-红外对管采集回来的信号通过2路循迹传感器模块里面的LM339比较器后输出高或低电平，从而实现信号的检测。 
-### 摄像头识别模块
-+ #### 编程开发环境、语言 
-<table><tr><td bgcolor=DarkSeaGreen>linux-python-opencv</td></tr></table> 
-
-+ #### “监听”，识别是否贴贴纸，以判断是否前进去识别  
-此处参考检测物体移动/动作检测的方法
->##### 1、摄像头识别
->[参考方法](https://blog.csdn.net/Wangguang_/article/details/89875170?spm=1001.2101.3001.6650.16&utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-16-89875170-blog-65440952.pc_relevant_aa2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-16-89875170-blog-65440952.pc_relevant_aa2&utm_relevant_index=17) 
->结果如图： 
->![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241219937.png) 
+>+ ### 关于openvino  
+>#### 1.为什么使用openvino  
+>openvino是intel开发的深度学习模型推理加速引擎，总体使用感觉就是方便，压缩后的模型再cpu上跑的速度可以媲美gpu（据称精度损失都小于5%）。使用openvino还有一个优点，就是openvino内置优化过的opencv，处理视频图像更方便。  
+>#### 2.如何使用openvino  
+>首先要把训练好的各种模型转换为openvino的标准IR模型（包含一个xml文件和bin文件，分别是模型结构和模型参数），然后调用推理引擎去对输入文件进行预测。   
+>github源代码链接[点击获取](https://github.com/openvinotoolkit/open_model_zoo)    
+>后续部署到树莓派到教程[链接](https://www.intel.cn/content/www/cn/zh/support/articles/000055510/boards-and-kits/neural-compute-sticks.html) 
 >
->##### 2、红外传感器
->[参考方法1](http://wjhsh.net/jingxinbk-p-12409029.html)
->[参考方法2](https://www.eda365.com/portal.php?mod=view&aid=168601)
- 
-+ #### 识别颜色  
->![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241247965.png) 
-><center>流程</center> 
->
->[在opencv框架下使用C++实现物料颜色识别1](https://blog.csdn.net/kilotwo/article/details/86744741?spm=1001.2101.3001.6650.16&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-16-86744741-blog-127303956.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-16-86744741-blog-127303956.pc_relevant_default&utm_relevant_index=19) 
->
->[在opencv框架下使用C++实现物料颜色识别2](https://it1995.blog.csdn.net/article/details/83056346?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-83056346-blog-88137314.pc_relevant_aa&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-83056346-blog-88137314.pc_relevant_aa&utm_relevant_index=5) 
->
->[在opencv框架下使用python实现物料颜色识别](https://blog.csdn.net/m0_52250472/article/details/120425725?spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-120425725-blog-106411746.pc_relevant_3mothn_strategy_recovery&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-120425725-blog-106411746.pc_relevant_3mothn_strategy_recovery&utm_relevant_index=9)
+>+ ### 手写数字&单词代码解析 
+>#### 1.使用摄像头采集图像 
+>同方案一step1   
+>#### 2.设备选择&读取模型 
+>```
+># 设备选择
+>    if 'GPU' in args.device:
+>        core.set_property("GPU", {"GPU_ENABLE_LOOP_UNROLLING": "NO", "CACHE_DIR": "./"})
+># 读取模型
+>    log.info('Reading model {}'.format(args.model))
+>    model = core.read_model(args.model)
+>    if len(model.inputs) != 1:
+>        raise RuntimeError("Demo supports only single input topologies")
+>    input_tensor_name = model.inputs[0].get_any_name()
+>    if args.output_blob is not None:
+>        output_tensor_name = args.output_blob
+>    else:
+>        if len(model.outputs) != 1:
+>            raise RuntimeError("Demo supports only single output topologies")
+>        output_tensor_name = model.outputs[0].get_any_name()
+>```  
+>#### 3.获取下载的字符列表
+>``` 
+># 获取下载的字符列表
+>    characters = get_characters(args)
+># 在文本标签和文本索引之间转换
+>    codec = CTCCodec(characters, args.designated_characters, args.top_k)
+>    if len(codec.characters) != model.output(output_tensor_name).shape[2]:
+>        raise RuntimeError("The text recognition model does not correspond to decoding characterlist")
+>``` 
+>其中获取下载字符列表函数如下(args为参数解析器对象）：
+>```
+>def get_characters(args):
+>    with open(args.charlist, 'r', encoding='utf-8') as f:
+>        return ''.join(line.strip('\n') for line in f)
+>```  
+>#### 4.预处理图片
+>``` 
+>input_batch_size, input_channel, input_height, input_width = model.inputs[0].shape
+>input_image = preprocess_input('character.jpg', height=input_height, width=input_width)[None, :, :, :]
+>if input_batch_size != input_image.shape[0]:
+>    raise RuntimeError("The model's input batch size should equal the input image's batch size")
+>if input_channel != input_image.shape[1]:
+>    raise RuntimeError("The model's input channel should equal the input image's channel")
+>```
+>图像预处理函数（转灰度图并resize）
+>``` 
+>def preprocess_input(image_name, height, width):
+>    # 读取图像并转化为灰度值
+>    src = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+>    # 计算输入图像的长高比
+>    ratio = float(src.shape[1]) / float(src.shape[0])
+>    # 按这个比例乘模型输入图片的高
+>    tw = int(height * ratio)
+>    # interpolation: 插值方法;INTER_AREA - 基于局部像素的重采样。
+>    # astype修改数据类型
+>    rsz = cv2.resize(src, (tw, height), interpolation=cv2.INTER_AREA).astype(np.float32)
+>    # [h,w] -> [c,h,w] 将图片扩展成三维数组
+>    img = rsz[None, :, :]
+>    _, h, w = img.shape
+>    # right eqdge padding 进行填充，变成目标大小
+>    pad_img = np.pad(img, ((0, 0), (0, height - h), (0, width - w)), mode='edge')
+>    return pad_img
+>``` 
+>#### 5.加载模型并预测
+>```
+># 加载模型
+>    compiled_model = core.compile_model(model, args.device)
+>    infer_request = compiled_model.create_infer_request()
+># 预测
+>    for _ in range(args.number_iter):
+>        infer_request.infer(inputs={input_tensor_name: input_image})
+>        preds = infer_request.get_tensor(output_tensor_name).data[:]
+>        result = codec.decode(preds)
+>        print(result)
+>```
 
-+ #### 识别手写体 
-> ##### 1、用OpenCV自带的神经网络
->[题主选用的BP算法进行训练，准确咧90%](https://blog.csdn.net/sheng_ai/article/details/23956919?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-23956919-blog-59727212.pc_relevant_recovery_v2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-23956919-blog-59727212.pc_relevant_recovery_v2&utm_relevant_index=3)  
->
->训练函数如下图 
->![](https://raw.githubusercontent.com/oxygen-berry/imageuploadservice/main/image/202211241303667.png)
-> ##### 2、KNN
->[链接(opencv官方给的手写体数字识别的例子也用的KNN)](https://blog.csdn.net/zzlwl/article/details/125216262)
-> ##### 3、其他
->[演示：基于Python+OpenCV+TensorFlow手写汉字识别系统](https://www.bilibili.com/video/av216101007/) 
->
->[使用C++结合Opencv库实现简易汉字识别](https://blog.csdn.net/weixin_44297922/article/details/121496280)
 
 
-### 通信模块 
-1.将树莓派与arduino通过usb线进行连接  
-2.在树莓派终端输入 ls /dev/tty*查看两者连接端口的名字。查看有没有ttyACM0 这个文件(注只有在两个硬件USB互连的情况下才会有这个。如果两者没有连接是不会有的) 最新的系统一般都会自动生成  
-3.编写树莓派与arduino通信代码
+
+
+
+
+
+
 
