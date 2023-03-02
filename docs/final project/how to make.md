@@ -208,6 +208,63 @@
 >    color = "VIOLET"
 >else:
 >    color = "RED"
+>```  
+
+<table><tr><td bgcolor=DarkSeaGreen ><font size=5 color=white>物体移动检测：opencv对比视频前后帧 <font></td></tr></table>  
+
+>摄像头获取图像——————预处理——————前后帧的对比并进行处理——————根据面积判断是否有移动  
+>#### 1.打开摄像头获取图像 
+>``` 
+>camera = cv2.VideoCapture(0)
+>if camera.open:
+>    print("相机打开成功!\n")
+>else:
+>    print("未能与相机建立连接...")
+>fps = 30  # 帧率
+>pre_frame = None  # 总是取前一帧做为背景（不用考虑环境影响）
+>
+>while True:
+>    start = time.time()
+>    # 读取视频流
+>    res, cur_frame = camera.read()
+>    if res != True:
+>        break
+>    end = time.time()
+>    seconds = end - start
+>    if seconds < 1.0 / fps: # 每1/30s读取一帧
+>        time.sleep(1.0 / fps - seconds) # 挂起等待直到时间满足1/30s
+>    cv2.imshow('img', cur_frame)
+>    # 检测如何按下Q键，则退出程序
+>    key = cv2.waitKey(30) & 0xff
+>    if key == 27:
+>        break
+>``` 
+>#### 2.预处理
+>``` 
+>gray_img = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)# 转灰度图
+>gray_img = cv2.resize(gray_img, (500, 500))# 将图片缩放
+>gray_img = cv2.GaussianBlur(gray_img, (21, 21), 0)# 用高斯滤波进行模糊处理 
+>```  
+>#### 3.前后帧的对比并进行处理
+>``` 
+>if pre_frame is None:# 如果没有背景图像就将当前帧当作背景图片
+>    pre_frame = gray_img
+>else:
+>    img_delta = cv2.absdiff(pre_frame, gray_img)# absdiff把两幅图的差的绝对值输出到另一幅图上面来
+>    thresh = cv2.threshold(img_delta, 25, 255, cv2.THRESH_BINARY)[1]# threshold阈值函数
+>    thresh = cv2.dilate(thresh, None, iterations=2)# 膨胀图像 
+>``` 
+>#### 4.根据面积判断是否有移动
+>``` 
+>contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+>for c in contours:
+>    # 灵敏度
+>    if cv2.contourArea(c) < 1000:
+>        continue
+>    else:
+>        print("something is moving!!!")
+>        break
+>pre_frame = gray_img
 >```
 
 
