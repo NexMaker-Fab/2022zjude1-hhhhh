@@ -162,11 +162,53 @@
 >        print(result)
 >``` 
 
-<table><tr><td bgcolor=DarkSeaGreen ><font size=5 color=white>颜色识别 : <font></td></tr></table>  
+<table><tr><td bgcolor=DarkSeaGreen ><font size=5 color=white>颜色识别 : opencv识别红橙黄绿蓝紫 <font></td></tr></table>  
 
->#### 1.使用摄像头采集图像 
-
-
+>摄像头获取图像并设置抓取图像大小——————颜色空间转换（BGR转HSV）——————获取中心点像素位置及hsv——————根据h空间进行颜色识别  
+>#### 1.摄像头获取图像并设置抓取图像大小  
+>``` 
+>cap = cv2.VideoCapture(0)
+>if cap.open:
+>    print("相机打开成功!\n")
+>else:
+>    print("未能与相机建立连接...")
+># 设置相机属性
+>cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+>cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+>```  
+>### 2.颜色空间转换（BGR转HSV） 
+>```
+>_, frame = cap.read()
+>hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV) 
+>``` 
+>### 3.获取中心点像素位置及hsv  
+>```
+>height, width, _ = frame.shape
+>cx = int(width / 2)
+>cy = int(height / 2)
+># 获取中心位置像素点的hsv值
+>pixel_center = hsv_frame[cy, cx]
+>``` 
+>### 4.根据h空间进行颜色识别 
+>```
+> # 获取 H 空间的数值
+>hue_value = pixel_center[0] 
+>color = "Undefined"
+>if hue_value < 5:
+>    color = "RED"
+>elif hue_value < 22:
+>    color = "ORANGE"
+>elif hue_value < 33:
+>    color = "YELLOW"
+>elif hue_value < 78:
+>    color = "GREEN"
+>elif hue_value < 131:
+>    color = "BLUE"
+>elif hue_value < 170:
+>    color = "VIOLET"
+>else:
+>    color = "RED"
+>```
 
 
 
